@@ -1,0 +1,98 @@
+$--color-ele-primary:#409EFF;
+$--color-ele-success:#67C23A;
+$--color-ele-warning:#E6A23C;
+$--color-ele-danger:#F56C6C;
+$--color-ele-info:#909399;
+$--color-zhuti:#02ad00;
+
+$--color:$--color-zhuti;
+
+
+// *{
+//     margin: 0;
+//     padding: 0;
+// }
+
+.tl {
+    text-align: left !important;
+}
+
+.tc {
+    text-align: center !important;
+}
+
+.tr {
+    text-align: right !important;
+}
+
+.fl {
+    float: left !important;
+}
+
+.fr {
+    float: right !important;
+}
+
+.dpn {
+    display: none !important;
+}
+
+.dpb {
+    display: block !important;
+}
+
+.dpib {
+    display: inline-block !important;
+}
+
+.dptc {
+    display: table-cell !important;
+}
+
+.vam{
+    vertical-align: middle !important;
+}
+
+.dpf {
+    display: flex !important;
+}
+.fone{
+    flex:1;
+}
+
+.dpf-jcc{
+    justify-content: center !important;
+}
+
+.dpf-jcsb{
+    justify-content: space-between !important;
+}
+
+.dpf-aic{
+    align-items: center !important;
+}
+
+.cb{
+    clear: both !important;
+}
+
+.cba:after {
+    content:".";
+    clear:both;
+    display:block;
+    height:0;
+    overflow:hidden;
+    visibility:hidden;
+}
+
+.ofh{
+    overflow: hidden !important;
+}
+
+.mauto{
+    margin: 0 auto !important;
+}
+
+.round{
+    border-radius: 50% !important;
+}
