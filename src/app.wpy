@@ -1,0 +1,111 @@
+
+
+<script>
+import wepy from 'wepy'
+import api from './config/api'
+import intercept from './config/intercept'
+import utils from './utils/index'
+import 'wepy-async-function'
+
+
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/my',
+      'pages/index',
+    ],
+    "tabBar": {
+      "borderStyle": "white",
+      "color": "#99d498",
+      "selectedColor": "#fff",
+      "backgroundColor": "#02ad00",
+      "list": [
+        {
+          "pagePath": "pages/index",
+          "text": "位置",
+          "iconPath": "assets/image/index.png",
+          "selectedIconPath": "assets/image/index-select.png"
+        },{
+          "pagePath": "pages/my",
+          "text": "更多",
+          "iconPath": "assets/image/my.png",
+          "selectedIconPath": "assets/image/my-select.png"
+        }
+      ]
+    },
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    }
+  }
+
+  userInfo = {}
+
+  api = api
+
+  utils=utils
+
+  request = intercept
+
+  nowCodeList = []
+
+  nowCodeId = -1
+
+  show(msg){
+    wx.showToast({
+      title: msg,
+      icon: 'none',
+      duration: 2000
+    })
+  }
+
+  showLoading(msg){
+    wx.showLoading({
+      title: `${msg}`,
+      mask: true
+    })
+  }
+
+  hideLoading() {
+    wx.hideLoading()
+  }
+  
+}
+</script>
+
+<style lang="scss">
+  @import 'assets/scss/index.scss';
+  @import 'assets/font/vant-icon.scss';
+  .content {
+    width: 100vw;
+  }
+  .btn{
+    display: block;
+    margin: 0 auto;
+    line-height: 96rpx;
+    font-size: 30rpx;
+    color: #fff;
+    letter-spacing: 2rpx;
+    text-align: center;
+    background: $--color;
+    border-radius: 18rpx;
+  }
+  @for $i from 0 through 10 {
+    .mt#{$i} { margin-top: 5rpx * $i; }
+    .mb#{$i} { margin-bottom: 5rpx * $i; }
+    .ml#{$i} { margin-left: 5rpx * $i; }
+    .mr#{$i} { margin-right: 5rpx * $i; }
+    .pt#{$i} { padding-top: 5rpx * $i; }
+    .pb#{$i} { padding-bottom: 5rpx * $i; }
+    .pl#{$i} { padding-left: 5rpx * $i; }
+    .pr#{$i} { padding-right: 5rpx * $i; }
+    .p#{$i} { padding: 5rpx * $i;}
+  }
+  input{
+    font-size:31rpx;
+    color:#000;
+  }
+</style>

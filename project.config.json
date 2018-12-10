@@ -1,0 +1,16 @@
+{
+	"description": "A WePY project",
+	"setting": {
+		"urlCheck": true,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx133658009c3dd03a",
+	"projectname": "dingwei-jie603",
+	"miniprogramRoot": "./dist",
+	"libVersion": "2.4.0",
+	"condition": {}
+}
