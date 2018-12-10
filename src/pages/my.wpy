@@ -1,0 +1,163 @@
+<style lang="scss">
+  .my{
+    .map{
+        width: 100vw;
+        height: 40vh;
+    }
+    .address,.number,.parameter{
+        padding: 20rpx;
+        font-size: 29rpx;
+        line-height: 45rpx;
+        border-bottom:1rpx solid #ddd;
+        margin-bottom: 20rpx;
+    }
+    .number{
+        border-top: 1rpx solid #ddd;
+        font-size: 31rpx;
+        font-weight: bold;
+    }
+    .parameter{
+        border-top: 1rpx solid #ddd;
+        .title{
+            font-weight: bold;
+        }
+        .main{
+            position: relative;
+            padding-bottom: 35rpx;
+            .main_title{
+                padding-top: 3rpx;
+            }
+            .main_progressBar{
+                display: flex;
+                align-items: center;
+                width:700rpx;
+                .main_progressBar_value{
+                    flex:1;
+                    text-align: center;
+                    height: 50rpx;
+                    line-height: 50rpx;
+                    &::after{
+                        content: ' ';
+                    }
+                    &:nth-child(1){
+                        border:4rpx solid #fff;
+                    }
+                    &:nth-child(2){
+                        background-color: rgb(241, 9, 15);
+                        border:4rpx solid #aaa;
+                    }
+                    &:nth-child(3){
+                        background-color: rgb(252, 188, 20);
+                        border:4rpx solid #aaa;
+                    }
+                    &:nth-child(4){
+                        background-color: rgb(252, 248, 17);
+                        border:4rpx solid #aaa;
+                    }
+                    &:nth-child(5){
+                        background-color: rgb(147, 207, 73);
+                        border:4rpx solid #aaa;
+                    }
+                    &:nth-child(6){
+                        background-color: rgb(13, 161, 96);
+                        border:4rpx solid #aaa;
+                    }
+                    &:nth-child(1){
+                        border:4rpx solid #fff;
+                    }
+                }
+            }
+            .pointer{
+                width: 0;
+                height: 0;
+                border-left: 15rpx solid transparent;
+                border-right: 15rpx solid transparent;
+                border-bottom: 25rpx solid rgb(232,162,12);
+                position: absolute;
+                left: 0;
+                bottom: 0;
+            }
+        }
+    }
+  }
+</style>
+
+<template lang="wxml">
+    <view class="content my">
+        <map name="" class="map"></map>
+        <view class="address">
+            <text>位置信息:中国上海市杨浦区军工路</text>
+            <text>
+                位置信息:中国上海市杨浦区军工路</text>
+        </view>
+        <view class="number">
+            <text>iccid:186076371</text>
+            <text>
+                imie:868744030987428</text>
+        </view>
+        <view class="parameter">
+            <view class="title">
+                NB-IOT网络信号检测(详细参数)
+            </view>
+            <view class="main">
+                <view class="main_title">
+                    RSRP:0dBm(信号接收功率)
+                </view>
+                <view class="main_progressBar">
+                    <view class="main_progressBar_value">
+                        极差
+                    </view>
+                    <view class="main_progressBar_value">
+                        
+                    </view>
+                    <view class="main_progressBar_value">
+                        
+                    </view>
+                    <view class="main_progressBar_value">
+                        
+                    </view>
+                    <view class="main_progressBar_value">
+                        
+                    </view>
+                    <view class="main_progressBar_value">
+                        
+                    </view>
+                    <view class="main_progressBar_value">
+                        极好
+                    </view>
+                </view>
+                <view class="pointer" style="left:{{num+89}}rpx;"></view>
+            </view>
+
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class my extends wepy.page {
+    config = {
+        "navigationBarTitleText": "更多"
+    };
+    
+    components = {
+        
+    };
+
+    data = {
+        num:0,
+    };
+
+    methods = {
+        
+    };
+
+    events = {
+        
+    };
+
+    onLoad(){
+        
+    }
+}
+</script>
