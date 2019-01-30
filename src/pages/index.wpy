@@ -30,29 +30,33 @@
 <template>
   <view class="content index">
     {{title}}
-    <view class="isOpenBlue tc">
+    <!-- <view class="isOpenBlue tc">
       {{'蓝牙：'+(isOpenBlue?'开':'关')+',搜索：'+(searchStatus?'是':'否')+',连接设备：'+(connectStatus?'是':'否')}}
     </view>
+    <view class="isOpenBlue tc">
+      {{'设备名：'+serviceName}}
+    </view> -->
     <button class="openBlue" bindtap="OpenBlue">打开蓝牙</button>
-    <button class="openBlue" bindtap="searchBlue" wx:if="{{isOpenBlue}}">{{searchStatus?'停止搜索':'搜索设备'}}</button>
+    <!-- <button class="openBlue" bindtap="searchBlue" wx:if="{{isOpenBlue}}">{{searchStatus?'停止搜索':'搜索设备'}}</button> -->
     <button class="closeBlue" bindtap="closeBlue">关闭蓝牙</button>
-    <view class="equ mt5 mb5">
+    <!-- <view class="equ mt5 mb5">
       <text class="equTitle pl5">设备:</text>
       <view class="list_main" wx:for="{{list}}"  wx:key="{{index}}">
         <text class="left">{{item.name+','+item.deviceId+','+item.RSSI+','+item.localName}}</text>
         <button class="right" @tap="careatConnectBlue({{item.deviceId}})" wx:if="{{!connectStatus}}">连接</button>
+        <button class="right" @tap="closeConnectBlue({{item.deviceId}})" wx:if="{{item.deviceId==connectId}}">断开连接</button>
       </view>
       <view class="equTitle tc" wx:if="{{list.length==0}}">无设备</view>
-    </view>
+    </view> -->
     
-    <view class="equ mt5 mb5" wx:if="{{connectStatus}}">
+    <!-- <view class="equ mt5 mb5" wx:if="{{connectStatus}}">
       <text class="equTitle pl5">服务:</text>
       <view class="list_main" wx:for="{{listservice}}"  wx:key="{{index}}">
         <text class="left">{{item.uuid}}</text>
         <button class="right" @tap="getBlueConnectChart({{item.uuid}})">监听</button>
       </view>
       <view class="equTitle tc" wx:if="{{listservice.length==0}}">无服务</view>
-    </view>
+    </view> -->
 
     
     <view class="debug  pr5 pl5">
@@ -69,6 +73,7 @@
     }
 
     data = {
+      equName:'',
       title:'',
       debug:'',
       list:[],
@@ -76,7 +81,9 @@
       isOpenBlue:false,
       searchStatus:false,
       connectStatus:false,
-      connectId:''
+      serviceName:'',
+      connectId:'',
+      characteristicId:''
     }
 
     methods = {
@@ -97,6 +104,7 @@
               this.SearchBlueChange()
               this.blueConnectChange()
               this.blueConnectValueChange()
+              this.searchBlue()
             }, 2000);
           },
           fail:(err)=>{
@@ -122,6 +130,7 @@
             // this.title='蓝牙已关闭'
             this.isOpenBlue=false
             this.debug=this.debug+'蓝牙开关：关;\n'
+            this.title='蓝牙已关闭'
             this.$apply()
           },
           fail:(err)=>{
@@ -130,64 +139,85 @@
           }
         })
       },
-      searchBlue(){                         //是否搜蓝牙
+    }
+
+    searchBlue(){                         //是否搜蓝牙
         if(this.searchStatus){
           this.stopSearchBlue()
-          for(let i in this.list){
-            console.log(this.ab2hex(this.list[i].advertisData))
-          }
         }else{
           if(this.connectStatus){
             this.closeConnectBlue()
           }
           this.startSearchBlue()
         }
-      },
-      careatConnectBlue(id){              //连接指定设备
-        if(this.searchStatus){
-          this.stopSearchBlue()
-        }
-        this.$parent.showLoading('连接中')
-        wx.createBLEConnection({
-          deviceId:id,
-          success:res=>{
-            this.$parent.hideLoading()
-            this.connectId=id
-            this.connectStatus=true
-            this.debug=this.debug+'与'+id+'连接;"\n"'
-            this.$apply()
-            this.getBlueConnectServices()
-          },
-          fail:err=>{
-            this.$parent.show('连接失败')
-            this.debug=this.debug+'连接蓝牙失败：'+JSON.stringify(err)+'\n'
-            this.$apply()
-          }
-        }) 
-      },
-      getBlueConnectChart(id){                //获取设备服务的特征值
-        wx.getBLEDeviceCharacteristics({
-          deviceId:this.connectId,
-          serviceId:id,
-          success:res=>{
-            let notify_id;
-            for (let i = 0; i < res.characteristics.length; i++) {
-              let charc = res.characteristics[i];
-              if (charc.properties.notify) {
-                notify_id = charc.uuid;           
-              }
-            }
-            if(notify_id){
-              this.blueConnectNotifyValueChange(id,notify_id)
-            }
-            
-          },
-          fail:err=>{
-            this.$parent.show('获取特征值失败')
-          }
-        })
-      }
     }
+
+    careatConnectBlue(id){              //连接指定设备
+      if(this.searchStatus){
+        this.stopSearchBlue()
+      }
+      // this.$parent.showLoading('连接中')
+      wx.createBLEConnection({
+        deviceId:id,
+        success:res=>{
+          this.$parent.hideLoading()
+          this.connectId=id
+          this.connectStatus=true
+          this.debug=this.debug+'与'+id+'连接;"\n"'
+          this.serviceName=id
+          this.$apply()
+          this.getBlueConnectServices()
+        },
+        fail:err=>{
+          this.$parent.show('连接失败')
+          this.debug=this.debug+'连接蓝牙失败：'+JSON.stringify(err)+'\n'
+          this.title='连接失败,请重试'
+          this.$apply()
+        }
+      }) 
+    }
+
+    closeConnectBlue(id){              //断开指定设备
+      this.$parent.showLoading('断开中')
+      wx.closeBLEConnection({
+        deviceId:id,
+        success:res=>{
+          this.$parent.hideLoading()
+        },
+        fail:err=>{
+          this.$parent.show('断开失败')
+          this.$apply()
+        }
+      }) 
+    }
+
+    getBlueConnectChart(id){                //连接服务，获取设备服务的特征值
+      wx.getBLEDeviceCharacteristics({
+        deviceId:this.connectId,
+        serviceId:id,
+        success:res=>{
+          this.debug=this.debug+'获取服务中的所有特征值：'+JSON.stringify(res)
+          this.$apply();
+          let notify_id;
+          for (let i = 0; i < res.characteristics.length; i++) {
+            let charc = res.characteristics[i];
+            if (charc.properties.notify || charc.properties.indicate) {
+              notify_id = charc.uuid;           
+            }
+          }
+          if(notify_id){
+            this.blueConnectNotifyValueChange(id,notify_id)
+          }
+          
+        },
+        fail:err=>{
+          this.$parent.show('获取特征值失败')
+          this.title='连接失败,请重试'
+          this.$apply()
+        }
+      })
+    }
+
 
     closeConnectBlue(){                  //断开与设备连接
       wx.closeBLEConnection({
@@ -207,12 +237,16 @@
         deviceId:this.connectId,
         success:(res)=>{
           if(res.services&&res.services.length){
-            this.listservice=res.services
+            for(let i in res.services){
+              if(res.services[i].uuid.indexOf('000018AA-0000-1000-8000-00805F9B34FB')!==-1){
+                this.getBlueConnectChart(res.services[i].uuid)
+              }
+            }
           }
-          this.$apply()
         },
         fail:err=>{
-          this.$parent.show('获取失败')
+          this.$parent.show('连接失败')
+          this.title='连接失败,请重试'
           this.$apply()
         }
       })
@@ -227,11 +261,14 @@
         characteristicId,
         success:res=>{
           this.$parent.hideLoading()
-          this.title=this.title+characteristicId+','
+          this.characteristicId=characteristicId
+          this.title='已连接设备'+this.equName
           this.$apply()
         },
         fail:err=>{
           this.$parent.show('启动特征值notify监听失败')
+          this.title='连接失败,请重试'
+          this.$apply()
         }
       })
     }
@@ -251,10 +288,10 @@
         allowDuplicatesKey:false,
         interval:100,
         success:(res)=>{
-          // this.title='正在搜索中...'
-          // this.searchStatus=true
+          this.title='正在搜索中...'
+          this.searchStatus=true
+          this.$apply()
           // this.debug=this.debug+'停止搜索蓝牙设备：'+JSON.stringify(res)
-          // this.$apply()
         },
         fail:(err)=>{
           this.$parent.show('开始失败')
@@ -263,45 +300,67 @@
     }
 
     stopSearchBlue(){                   //停止搜索蓝牙
-      wx.stopBluetoothDevicesDiscovery({
-        success:(res)=>{
-          // this.title='已停止搜索'
-          // this.searchStatus=false
-          // this.debug=this.debug+'开始搜索蓝牙设备：'+JSON.stringify(res)
-          // this.$apply()
-        },
-        fail:(err)=>{
-          this.$parent.show('停止失败')
+      if(this.searchStatus){
+        wx.stopBluetoothDevicesDiscovery({
+          success:(res)=>{
+            // this.title='已停止搜索'
+            this.searchStatus=false
+            // this.debug=this.debug+'开始搜索蓝牙设备：'+JSON.stringify(res)
+            this.$apply()
+          },
+          fail:(err)=>{
+            this.$parent.show('停止失败')
+          }
+        })
+      }
+    }
+
+    // getBlueList(){                      //获取蓝牙列表
+    //   //   wx.getBluetoothDevices({
+    //   //     success:res{
+    //   //       console.log(res)
+    //   //       if (res.devices[0]) {
+    //   //         console.log(ab2hex(res.devices[0].advertisData))
+    //   //       }
+    //   //     },
+    //   //     fail:res=>{
+    //   //       this.$parent.show('获取失败')
+    //   //     }
+    //   //   })
+    // }
+
+    wirteBlue(){
+      const buffer = new ArrayBuffer('1')
+      const dataView = new DataView(buffer)
+      dataView.setUint8(0, 0)
+      wx.writeBLECharacteristicValue({
+        deviceId:this.connectId,
+        // 这里的 serviceId 需要在 getBLEDeviceServices 接口中获取
+        serviceId:'000018AA-0000-1000-8000-00805F9B34FB',
+        // 这里的 characteristicId 需要在 getBLEDeviceCharacteristics 接口中获取
+        characteristicId:this.characteristicId,
+        // 这里的value是ArrayBuffer类型
+        value:buffer,
+        success(res) {
+          console.log('writeBLECharacteristicValue success', res.errMsg)
         }
       })
     }
 
-    getBlueList(){                      //获取蓝牙列表
-      //   wx.getBluetoothDevices({
-      //     success:res{
-      //       console.log(res)
-      //       if (res.devices[0]) {
-      //         console.log(ab2hex(res.devices[0].advertisData))
-      //       }
-      //     },
-      //     fail:res=>{
-      //       this.$parent.show('获取失败')
-      //     }
-      //   })
-    }
-
     blueConnectValueChange(){           //设备特征值变化监听
       wx.onBLECharacteristicValueChange(res=>{
-        this.debug=this.debug+'设备特征值变化：'+JSON.stringify(res)
+        this.debug='设备特征值变化：'+JSON.stringify(this.ab2hex(res.value))
         this.$apply()
+        this.wirteBlue()
       })
     }
 
     blueConnectChange(){                //蓝牙连接设备情况监听
       wx.onBLEConnectionStateChange(res=>{
         if(!res.connected){
+          this.title='连接断开'
           this.connectStatus=false
-          this.debug=this.debug+'与'+this.connectId+'连接已断开;\n'
+          this.serviceName=''
           this.connectId=''
           this.listservice=[]
           this.$apply()
@@ -311,15 +370,23 @@
 
     SearchBlueChange(){                 //搜索结果监听
       wx.onBluetoothDeviceFound(res=>{
-        res.devices.map(data=>{
-          return {
-            ...data,
-            advertis:this.ab2hex(data.advertisData)
-          }
-        })
-        this.list=[...this.list,...res.devices]
+        // res.devices.map(data=>{
+        //   return {
+        //     ...data,
+        //     advertis:this.ab2hex(data.advertisData)
+        //   }
+        // })
+        // this.list=[...this.list,...res.devices]
         // this.debug=this.debug+'搜索设备变化：'+JSON.stringify(res)
-        this.$apply()
+        for(let i in res.devices){
+          if(res.devices[i].name && res.devices[i].name.indexOf('BLE_SMTCN')!==-1){
+            this.title="正在连接"+res.devices[i].name+'中...'
+            this.equName=res.devices[i].name
+            this.$apply()
+            this.careatConnectBlue(res.devices[i].deviceId)
+            return 
+          }
+        }
       })
     }
 
@@ -327,7 +394,6 @@
       wx.onBluetoothAdapterStateChange(res=>{
         if(res.available!==this.isOpenBlue){
           this.isOpenBlue=res.available
-          this.debug=this.debug+'蓝牙开关：'+(res.available?'开':'关')+';\n'
           if(!res.available){
             this.list=[]
           }
@@ -335,7 +401,6 @@
         }
         if(res.discovering!==this.searchStatus){
           this.searchStatus=res.discovering
-          this.debug=this.debug+'搜索开关：'+(res.discovering?'开':'关')+';\n'
         }
         this.$apply()
       })
